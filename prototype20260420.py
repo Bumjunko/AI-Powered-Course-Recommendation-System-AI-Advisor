@@ -1,23 +1,19 @@
 import re
+import json
+import os
 
-# Knowledge Base
-# Standardized key format: "DEPT ####" (e.g., "CS 1336")
-courses_db = {
-    "CS 1336": {"name": "Computer Science I", "prereq": [], "category": "Basic"},
-    "CS 1337": {"name": "Computer Science II", "prereq": ["CS 1336"], "category": "Basic"},
-    "CS 2336": {"name": "Data Structures", "prereq": ["CS 1337"], "category": "Core"},
-    "CS 3304": {"name": "Programming Languages", "prereq": ["CS 2336"], "category": "Core"},
-    "CS 3310": {"name": "Computer Architecture", "prereq": ["CS 1337"], "category": "Systems"},
-    "CS 3311": {"name": "Operating Systems", "prereq": ["CS 2336", "CS 3310"], "category": "Systems"},
-    "CS 4301": {"name": "Distributed Systems", "prereq": ["CS 3311"], "category": "Systems"},
-    "CS 4306": {"name": "Artificial Intelligence", "prereq": ["CS 2336", "CS 3304"], "category": "AI"},
-    "CS 4308": {"name": "Machine Learning", "prereq": ["CS 4306"], "category": "AI"},
-    "CS 4310": {"name": "Advanced Architecture", "prereq": ["CS 3310"], "category": "Systems"},
-    "CS 4312": {"name": "Web Applications", "prereq": ["CS 2336"], "category": "Software"},
-    "CS 4314": {"name": "Cybersecurity", "prereq": ["CS 3311"], "category": "Security"},
-    "CS 4318": {"name": "Data Mining", "prereq": ["CS 2336"], "category": "AI"},
-    "CS 4320": {"name": "Networks", "prereq": ["CS 3311"], "category": "Security"}
-}
+def loadDatabase(file_path):
+    """
+    Loads the knowledge base from a JSON file.
+    """
+    if not os.path.exists(file_path):
+        print(f"Error: {file_path} not found.")
+        return {}
+    with open(file_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+coursesDb = {}
+
 
 def is_category_unlocked(category, user_passed):
     """
@@ -91,6 +87,13 @@ def preprocess_input(raw_input):
     return standardized
 
 def main():
+    global coursesDb
+    coursesDb = loadDatabase('prototype20260420.json')
+
+    if not coursesDb:
+        return
+
+        
     print("==========================================")
     print("   ASU CS Course Advisor (AI System)    ")
     print("==========================================\n")
