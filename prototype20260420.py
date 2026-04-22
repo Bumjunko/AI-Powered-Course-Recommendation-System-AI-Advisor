@@ -25,7 +25,7 @@ def is_category_unlocked(category, user_passed):
     
     # Get all courses belonging to a specific category
     def get_courses_by_cat(cat_name):
-        return [code for code, info in courses_db.items() if info["category"] == cat_name]
+        return [code for code, info in coursesDb.items() if info["category"] == cat_name]
 
     if category == "Core":
         # Unlock Core only if ALL Basic courses are passed
@@ -44,7 +44,7 @@ def can_enroll(course_code, passed_courses):
     Logic: Checks if all prerequisites for a specific course are met.
     Predicate Logic: ∀p (Prereq(p, course) → Passed(s, p))
     """
-    prereqs = courses_db[course_code]["prereq"]
+    prereqs = coursesDb[course_code]["prereq"]
     return all(p in passed_courses for p in prereqs)
 
 def ai_advisor_inference(user_passed, user_interest):
@@ -53,7 +53,7 @@ def ai_advisor_inference(user_passed, user_interest):
     """
     available_courses = []
     
-    for code, info in courses_db.items():
+    for code, info in coursesDb.items():
         if code in user_passed:
             continue
             
@@ -108,7 +108,7 @@ def main():
 
     # 2. Completed Courses Input
     print("\n02. Enter completed course codes")
-    print("Example: CS 1336, CS 1337, CS 2336")
+    print("Course Code Examples: CS 1336, CS 1337, CS 2336")
     print("Format must include both Letters and Numbers.")
     print("(Press Enter if you haven't taken any courses yet)")
     raw_user_input = input(">> ").strip()
