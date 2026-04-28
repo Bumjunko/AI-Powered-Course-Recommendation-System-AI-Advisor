@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Computer Science Advisor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="app-shell">
+        <section class="intro">
+            <div>
+                <p class="eyebrow">Knowledge-Based AI Advisor</p>
+                <h1>AI Computer Science Advisor</h1>
+                <p class="summary">A rule-based advising system that uses completed courses, prerequisite logic, interests, and credit limits to infer next-semester course recommendations.</p>
+            </div>
+        </section>
+
+        <section class="dashboard">
+            <form id="advisor-form" class="panel">
+                <h2>Student Profile</h2>
+
+                <label class="field">
+                    <span>Student name</span>
+                    <input id="student-name" type="text" placeholder="Enter your name">
+                </label>
+
+                <label class="field">
+                    <span>Max credits</span>
+                    <select id="max-credits">
+                        <option value="6">6 credits</option>
+                        <option value="9">9 credits</option>
+                        <option value="12" selected>12 credits</option>
+                        <option value="15">15 credits</option>
+                    </select>
+                </label>
+
+                <div class="field">
+                    <span>Completed courses</span>
+                    <div class="checkbox-grid">
+                        {% for code, course in courses.items() %}
+                        <label class="checkbox-card">
+                            <input type="checkbox" name="completed" value="{{ code }}">
+                            <span>{{ code }}</span>
+                            <small>{{ course.name }}</small>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <span>Interests</span>
+                    <div class="chip-grid">
+                        {% for interest in interests %}
+                        <label class="chip">
+                            <input type="checkbox" name="interest" value="{{ interest }}">
+                            <span>{{ interest }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button class="primary-button" type="submit">Recommend Courses</button>
+            </form>
+
+            <section class="results">
+                <article class="panel">
+                    <h2>Recommended Schedule</h2>
+                    <p id="credit-total" class="muted">No recommendation yet.</p>
+                    <div id="recommended-courses" class="course-list"></div>
+                </article>
+
+                <article class="panel">
+                    <h2>Eligible Courses</h2>
+                    <div id="eligible-courses" class="course-list compact"></div>
+                </article>
+
+                <article class="panel">
+                    <h2>Unavailable Courses</h2>
+                    <div id="unavailable-courses" class="course-list compact"></div>
+                </article>
+
+                <article class="panel wide">
+                    <h2>Reasoning Explanation</h2>
+                    <ol id="reasoning-steps" class="reasoning"></ol>
+                </article>
+            </section>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
