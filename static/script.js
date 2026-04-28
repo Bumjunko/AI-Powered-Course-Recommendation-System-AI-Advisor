@@ -17,7 +17,6 @@ function courseCard(course, extra = "") {
             <div class="badges">
                 ${course.credits ? `<span class="badge">${course.credits} credits</span>` : ""}
                 ${course.category ? `<span class="badge">${course.category}</span>` : ""}
-                ${course.score !== undefined ? `<span class="badge">score ${course.score}</span>` : ""}
             </div>
         </div>
     `;
