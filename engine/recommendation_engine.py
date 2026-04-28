@@ -45,11 +45,15 @@ def recommend_courses(student, courses, eligible_courses):
             "credits": course_info["credits"],
             "category": course_info["category"],
             "level": course_info["level"],
-            "score": score,
+            "raw_score": score,
             "explanation": "; ".join(reasons) if reasons else "eligible course with no extra priority factors",
         })
 
-    ranked_courses.sort(key=lambda item: (-item["score"], item["level"], item["code"]))
+    ranked_courses.sort(key=lambda item: (-item["raw_score"], item["level"], item["code"]))
+    max_score = max((course["raw_score"] for course in ranked_courses), default=0)
+    for course in ranked_courses:
+        course["score"] = round((course["raw_score"] / max_score) * 100) if max_score else 0
+        del course["raw_score"]
 
     recommended = []
     total_credits = 0

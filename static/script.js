@@ -26,7 +26,7 @@ function recommendedCourseCard(course) {
     return `
         <div class="course-card">
             <strong>${course.code} - ${course.name}</strong>
-            <div class="score-line">Recommendation score: ${course.score}</div>
+            <div class="score-line">Recommendation score: ${course.score}/100</div>
             <details class="explanation-toggle">
                 <summary>View recommendation reason</summary>
                 <p>${course.explanation}</p>
