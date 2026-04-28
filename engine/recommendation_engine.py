@@ -9,23 +9,23 @@ def calculate_score(student, course_code, course_info, courses):
     priority = course_info.get("priority", 0)
     if priority:
         score += priority
-        reasons.append(f"course priority +{priority}")
+        reasons.append(f"This course has a curriculum priority of {priority}.")
 
     if course_info.get("category") in {"Basic", "Core"}:
         score += 8
-        reasons.append("required foundation/core course +8")
+        reasons.append("It is a foundation or core course that supports degree progress.")
 
     matched_interests = sorted(student.interests.intersection(course_info.get("interests", set())))
     if matched_interests:
         interest_points = 5 * len(matched_interests)
         score += interest_points
-        reasons.append(f"interest match {matched_interests} +{interest_points}")
+        reasons.append(f"It matches your interest area(s): {', '.join(matched_interests)}.")
 
     unlock_value = get_unlock_value(course_code, courses)
     if unlock_value:
         unlock_points = 2 * unlock_value
         score += unlock_points
-        reasons.append(f"unlocks {unlock_value} future course(s) +{unlock_points}")
+        reasons.append(f"Completing it unlocks {unlock_value} future course(s).")
 
     return score, reasons
 
@@ -46,7 +46,8 @@ def recommend_courses(student, courses, eligible_courses):
             "category": course_info["category"],
             "level": course_info["level"],
             "raw_score": score,
-            "explanation": "; ".join(reasons) if reasons else "eligible course with no extra priority factors",
+            "explanation": " ".join(reasons) if reasons else "This course is eligible based on your completed prerequisites.",
+            "explanation_items": reasons or ["This course is eligible based on your completed prerequisites."],
         })
 
     ranked_courses.sort(key=lambda item: (-item["raw_score"], item["level"], item["code"]))

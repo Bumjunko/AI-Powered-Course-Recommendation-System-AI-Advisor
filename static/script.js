@@ -23,13 +23,17 @@ function courseCard(course, extra = "") {
 }
 
 function recommendedCourseCard(course) {
+    const explanationItems = course.explanation_items || [course.explanation];
+
     return `
         <div class="course-card">
             <strong>${course.code} - ${course.name}</strong>
             <div class="score-line">Recommendation score: ${course.score}/100</div>
             <details class="explanation-toggle">
                 <summary>View recommendation reason</summary>
-                <p>${course.explanation}</p>
+                <ul>
+                    ${explanationItems.map((item) => `<li>${item}</li>`).join("")}
+                </ul>
             </details>
             <div class="badges">
                 ${course.credits ? `<span class="badge">${course.credits} credits</span>` : ""}

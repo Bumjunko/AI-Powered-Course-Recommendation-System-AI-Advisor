@@ -193,9 +193,14 @@ input[type="text"], select {
     font-weight: 700;
 }
 
-.explanation-toggle p {
+.explanation-toggle ul {
     margin: 8px 0 0;
+    padding-left: 20px;
     line-height: 1.45;
+}
+
+.explanation-toggle li + li {
+    margin-top: 4px;
 }
 
 .badges {
