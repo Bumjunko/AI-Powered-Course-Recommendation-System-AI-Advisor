@@ -22,6 +22,23 @@ function courseCard(course, extra = "") {
     `;
 }
 
+function recommendedCourseCard(course) {
+    return `
+        <div class="course-card">
+            <strong>${course.code} - ${course.name}</strong>
+            <div class="score-line">Recommendation score: ${course.score}</div>
+            <details class="explanation-toggle">
+                <summary>View recommendation reason</summary>
+                <p>${course.explanation}</p>
+            </details>
+            <div class="badges">
+                ${course.credits ? `<span class="badge">${course.credits} credits</span>` : ""}
+                ${course.category ? `<span class="badge">${course.category}</span>` : ""}
+            </div>
+        </div>
+    `;
+}
+
 function renderList(element, items, renderItem, emptyText) {
     element.innerHTML = items.length ? items.map(renderItem).join("") : `<p class="muted">${emptyText}</p>`;
 }
@@ -48,7 +65,7 @@ form.addEventListener("submit", async (event) => {
     renderList(
         recommendedCourses,
         data.recommended_courses,
-        (course) => courseCard(course, course.explanation),
+        recommendedCourseCard,
         "No recommended courses yet."
     );
 

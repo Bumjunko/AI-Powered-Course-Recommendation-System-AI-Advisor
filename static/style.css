@@ -176,6 +176,28 @@ input[type="text"], select {
     margin-bottom: 4px;
 }
 
+.score-line {
+    color: var(--text);
+    font-weight: 700;
+    margin: 6px 0 8px;
+}
+
+.explanation-toggle {
+    margin: 8px 0 4px;
+    color: var(--muted);
+}
+
+.explanation-toggle summary {
+    color: var(--accent-dark);
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.explanation-toggle p {
+    margin: 8px 0 0;
+    line-height: 1.45;
+}
+
 .badges {
     display: flex;
     flex-wrap: wrap;
