@@ -63,6 +63,28 @@
                 <button class="primary-button" type="submit">Recommend Courses</button>
             </form>
 
+            <article class="panel" style="grid-column: 1; margin-top: 1rem;">
+                <h2>Target Goal Analysis (Backward Chaining)</h2>
+                <p class="muted" style="margin-bottom: 1rem;">Select a future goal to see required prerequisites.</p>
+                
+                <label class="field">
+                    <span>Select Target Course</span>
+                    <select id="target-course" style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ddd;">
+                        <option value="">-- Choose a Course --</option>
+                        {% for code, course in courses.items() %}
+                        <option value="{{ code }}">{{ code }}: {{ course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                
+                <button class="primary-button" type="button" onclick="analyzeGoal()" style="background-color: #6366f1; margin-top: 1rem;">Analyze Roadmap</button>
+
+                <div id="goal-result" style="display:none; margin-top: 1.5rem; padding: 1rem; border-radius: 8px; background-color: #f8fafc; border-left: 4px solid #6366f1;">
+                    <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Roadmap Result:</h3>
+                    <p id="roadmap-path" style="line-height: 1.6;"></p>
+                </div>
+            </article>
+
             <section class="results">
                 <article class="panel">
                     <h2>Recommended Schedule</h2>
@@ -89,5 +111,40 @@
     </main>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    
+    <script>
+    function analyzeGoal() {
+        const target = document.getElementById('target-course').value;
+        const resultDiv = document.getElementById('goal-result');
+        const pathSpan = document.getElementById('roadmap-path');
+        
+        if (!target) {
+            alert("Please select a target course first.");
+            return;
+        }
+
+        const completed = Array.from(document.querySelectorAll('input[name="completed"]:checked'))
+                               .map(cb => cb.value);
+
+        fetch('/analyze-goal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                target_course: target,
+                passed_courses: completed 
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            resultDiv.style.display = 'block';
+            if (data.missing && data.missing.length > 0) {
+                pathSpan.innerHTML = `To take <strong>${target}</strong>, you need to complete: <br><span style="color: #e11d48;">${data.missing.join(" → ")}</span>`;
+            } else {
+                pathSpan.innerHTML = `🎉 You have met all prerequisites for <strong>${target}</strong>!`;
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    </script>
 </body>
 </html>

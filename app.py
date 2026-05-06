@@ -1,19 +1,17 @@
 from flask import Flask, jsonify, render_template, request
 
 from data.courses import COURSES, INTERESTS
-from engine.inference_engine import infer_course_eligibility
+# Assuming you added get_missing_roadmap to engine/inference_engine.py
+from engine.inference_engine import infer_course_eligibility, get_missing_roadmap
 from engine.planner import plan_semesters
 from engine.recommendation_engine import recommend_courses
 from models.student import Student
 
-
 app = Flask(__name__)
-
 
 @app.route("/")
 def index():
     return render_template("index.html", courses=COURSES, interests=INTERESTS)
-
 
 @app.route("/recommend", methods=["POST"])
 def recommend():
@@ -48,6 +46,22 @@ def recommend():
         "semester_plan": plan_semesters(student, COURSES, max_semesters=4),
     })
 
+@app.route("/analyze-goal", methods=["POST"])
+def analyze_goal():
+    payload = request.get_json(silent=True) or {}
+    target_course = payload.get("target_course")
+    passed_courses = payload.get("passed_courses", [])
+
+    if not target_course:
+        return jsonify({"error": "No target course provided"}), 400
+
+    # Backward Chaining: Finding missing prerequisites recursively
+    missing = get_missing_roadmap(target_course, passed_courses, COURSES)
+
+    return jsonify({
+        "target_course": target_course,
+        "missing": missing
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)

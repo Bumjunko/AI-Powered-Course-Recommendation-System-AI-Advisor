@@ -47,6 +47,7 @@ function renderList(element, items, renderItem, emptyText) {
     element.innerHTML = items.length ? items.map(renderItem).join("") : `<p class="muted">${emptyText}</p>`;
 }
 
+// Forward Chaining: Recommend Courses Logic
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -91,3 +92,43 @@ form.addEventListener("submit", async (event) => {
         .map((step) => `<li>${step}</li>`)
         .join("");
 });
+
+// Backward Chaining: Target Goal Analysis Logic
+async function analyzeGoal() {
+    const targetCourse = document.querySelector("#target-course").value;
+    const resultDiv = document.querySelector("#goal-result");
+    const roadmapPath = document.querySelector("#roadmap-path");
+
+    if (!targetCourse) {
+        alert("Please select a target course first.");
+        return;
+    }
+
+    const payload = {
+        target_course: targetCourse,
+        passed_courses: checkedValues("completed")
+    };
+
+    try {
+        const response = await fetch("/analyze-goal", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload),
+        });
+        
+        const data = await response.json();
+
+        resultDiv.style.display = "block";
+        
+        if (data.missing && data.missing.length > 0) {
+            // Displays missing prerequisites with an arrow separator
+            const pathText = data.missing.join(" → ");
+            roadmapPath.innerHTML = `To take <strong>${data.target_course}</strong>, you need to complete: <br><span style="color: #e11d48; font-weight: bold;">${pathText}</span>`;
+        } else {
+            roadmapPath.innerHTML = `🎉 You have met all prerequisites for <strong>${data.target_course}</strong>!`;
+        }
+    } catch (error) {
+        console.error("Error fetching backward chaining analysis:", error);
+        alert("An error occurred while analyzing the goal.");
+    }
+}
