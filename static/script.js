@@ -4,6 +4,11 @@ const eligibleCourses = document.querySelector("#eligible-courses");
 const unavailableCourses = document.querySelector("#unavailable-courses");
 const reasoningSteps = document.querySelector("#reasoning-steps");
 const creditTotal = document.querySelector("#credit-total");
+const setupPage = document.querySelector("#setup-page");
+const resultsPage = document.querySelector("#results-page");
+const editProfileButton = document.querySelector("#edit-profile");
+const goalResult = document.querySelector("#goal-result");
+const roadmapPath = document.querySelector("#roadmap-path");
 
 function checkedValues(name) {
     return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map((input) => input.value);
@@ -47,24 +52,19 @@ function renderList(element, items, renderItem, emptyText) {
     element.innerHTML = items.length ? items.map(renderItem).join("") : `<p class="muted">${emptyText}</p>`;
 }
 
-// Forward Chaining: Recommend Courses Logic
-form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+function showSetupPage() {
+    setupPage.classList.remove("hidden");
+    resultsPage.classList.add("hidden");
+    window.scrollTo({top: 0, behavior: "smooth"});
+}
 
-    const payload = {
-        name: document.querySelector("#student-name").value,
-        completed_courses: checkedValues("completed"),
-        interests: checkedValues("interest"),
-        max_credits: Number(document.querySelector("#max-credits").value),
-    };
+function showResultsPage() {
+    setupPage.classList.add("hidden");
+    resultsPage.classList.remove("hidden");
+    window.scrollTo({top: 0, behavior: "smooth"});
+}
 
-    const response = await fetch("/recommend", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(payload),
-    });
-    const data = await response.json();
-
+function renderRecommendationResults(data) {
     creditTotal.textContent = `Total recommended credits: ${data.total_recommended_credits}`;
 
     renderList(
@@ -91,44 +91,80 @@ form.addEventListener("submit", async (event) => {
     reasoningSteps.innerHTML = data.reasoning_steps
         .map((step) => `<li>${step}</li>`)
         .join("");
-});
+}
 
-// Backward Chaining: Target Goal Analysis Logic
-async function analyzeGoal() {
-    const targetCourse = document.querySelector("#target-course").value;
-    const resultDiv = document.querySelector("#goal-result");
-    const roadmapPath = document.querySelector("#roadmap-path");
-
-    if (!targetCourse) {
-        alert("Please select a target course first.");
+function renderGoalResult(data) {
+    if (!data) {
+        goalResult.classList.add("hidden");
+        roadmapPath.innerHTML = "";
         return;
     }
 
+    goalResult.classList.remove("hidden");
+
+    if (data.missing && data.missing.length > 0) {
+        const pathText = data.missing.join(" → ");
+        roadmapPath.innerHTML = `To take <strong>${data.target_course}</strong>, complete: <span class="roadmap-path">${pathText}</span>`;
+    } else {
+        roadmapPath.innerHTML = `All prerequisites are complete for <strong>${data.target_course}</strong>.`;
+    }
+}
+
+async function analyzeSelectedGoal() {
+    const targetCourse = document.querySelector("#target-course").value;
+
+    if (!targetCourse) {
+        return null;
+    }
+
+    const response = await fetch("/analyze-goal", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            target_course: targetCourse,
+            passed_courses: checkedValues("completed"),
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error("Goal analysis failed.");
+    }
+
+    return response.json();
+}
+
+form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
     const payload = {
-        target_course: targetCourse,
-        passed_courses: checkedValues("completed")
+        name: document.querySelector("#student-name").value,
+        completed_courses: checkedValues("completed"),
+        interests: checkedValues("interest"),
+        max_credits: Number(document.querySelector("#max-credits").value),
     };
 
     try {
-        const response = await fetch("/analyze-goal", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload),
-        });
-        
-        const data = await response.json();
+        const [recommendationResponse, goalData] = await Promise.all([
+            fetch("/recommend", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(payload),
+            }),
+            analyzeSelectedGoal(),
+        ]);
 
-        resultDiv.style.display = "block";
-        
-        if (data.missing && data.missing.length > 0) {
-            // Displays missing prerequisites with an arrow separator
-            const pathText = data.missing.join(" → ");
-            roadmapPath.innerHTML = `To take <strong>${data.target_course}</strong>, you need to complete: <br><span style="color: #e11d48; font-weight: bold;">${pathText}</span>`;
-        } else {
-            roadmapPath.innerHTML = `🎉 You have met all prerequisites for <strong>${data.target_course}</strong>!`;
+        if (!recommendationResponse.ok) {
+            throw new Error("Recommendation request failed.");
         }
+
+        const recommendationData = await recommendationResponse.json();
+        renderRecommendationResults(recommendationData);
+        renderGoalResult(goalData);
+        showResultsPage();
     } catch (error) {
-        console.error("Error fetching backward chaining analysis:", error);
-        alert("An error occurred while analyzing the goal.");
+        console.error("Error generating advisor results:", error);
+        alert("An error occurred while generating advisor results.");
     }
-}
+});
+
+editProfileButton.addEventListener("click", showSetupPage);

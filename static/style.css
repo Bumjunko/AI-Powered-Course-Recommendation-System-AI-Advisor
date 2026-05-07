@@ -1,12 +1,17 @@
 :root {
     color-scheme: light;
-    --bg: #f5f7fb;
+    --navy: #245397;
+    --navy-dark: #1A2D50;
+    --gold: #F0C33B;
+    --gold-light: #FEF6D0;
+    --gold-dark: #C89E0A;
+    --bg: #F2F4F8;
     --panel: #ffffff;
-    --text: #1d2733;
-    --muted: #657286;
-    --line: #dce3ee;
-    --accent: #1463ff;
-    --accent-dark: #0c45b8;
+    --text: #1A2D50;
+    --muted: #5A6E96;
+    --line: #D4DAE8;
+    --accent: #F0C33B;
+    --accent-dark: #C89E0A;
     --success: #13795b;
     --warning: #9a5a00;
 }
@@ -22,22 +27,63 @@ body {
     color: var(--text);
 }
 
+/* ── Site Header ── */
+.site-header {
+    background: var(--navy-dark);
+    color: white;
+}
+
+.site-header-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.brand-abbr {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--gold);
+    letter-spacing: -0.5px;
+    line-height: 1;
+}
+
+.brand-divider {
+    width: 1px;
+    height: 28px;
+    background: rgba(255,255,255,0.3);
+}
+
+.brand-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.82);
+    letter-spacing: 0.02em;
+}
+
+/* ── Layout ── */
 .app-shell {
     max-width: 1180px;
     margin: 0 auto;
-    padding: 32px 20px 48px;
+    padding: 36px 20px 56px;
 }
 
 .intro {
-    margin-bottom: 24px;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--line);
 }
 
 .eyebrow {
     margin: 0 0 8px;
-    color: var(--accent-dark);
+    color: var(--gold-dark);
     font-weight: 700;
     text-transform: uppercase;
     font-size: 0.78rem;
+    letter-spacing: 0.08em;
 }
 
 h1, h2, p {
@@ -47,11 +93,13 @@ h1, h2, p {
 h1 {
     margin-bottom: 10px;
     font-size: 2.4rem;
+    color: var(--navy);
 }
 
 h2 {
     font-size: 1.15rem;
     margin-bottom: 16px;
+    color: var(--navy);
 }
 
 .summary {
@@ -60,9 +108,19 @@ h2 {
     line-height: 1.55;
 }
 
-.dashboard {
+.page-section {
     display: grid;
-    grid-template-columns: minmax(320px, 420px) 1fr;
+    gap: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ── Setup Grid ── */
+.setup-grid {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(320px, 0.85fr);
     gap: 20px;
     align-items: start;
 }
@@ -70,16 +128,24 @@ h2 {
 .panel {
     background: var(--panel);
     border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 8px 22px rgba(29, 39, 51, 0.06);
+    border-radius: 10px;
+    padding: 22px;
+    box-shadow: 0 2px 12px rgba(27, 42, 86, 0.07);
 }
 
+.panel h2 {
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--gold);
+    margin-bottom: 18px;
+}
+
+/* ── Form Fields ── */
 .field {
     display: grid;
     gap: 8px;
     margin-bottom: 18px;
     font-weight: 700;
+    color: var(--navy);
 }
 
 input[type="text"], select {
@@ -88,8 +154,18 @@ input[type="text"], select {
     border-radius: 6px;
     padding: 11px 12px;
     font: inherit;
+    color: var(--text);
+    background: #FAFBFD;
+    transition: border-color 0.15s;
 }
 
+input[type="text"]:focus, select:focus {
+    outline: none;
+    border-color: var(--navy);
+    background: white;
+}
+
+/* ── Checkbox Cards ── */
 .checkbox-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -97,7 +173,7 @@ input[type="text"], select {
 }
 
 .checkbox-card {
-    min-height: 72px;
+    min-height: 68px;
     border: 1px solid var(--line);
     border-radius: 8px;
     padding: 10px;
@@ -107,6 +183,14 @@ input[type="text"], select {
     align-items: start;
     font-weight: 700;
     cursor: pointer;
+    background: #FAFBFD;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.checkbox-card:has(input:checked) {
+    border-color: var(--gold);
+    background: var(--gold-light);
+    color: var(--navy-dark);
 }
 
 .checkbox-card small {
@@ -116,6 +200,7 @@ input[type="text"], select {
     line-height: 1.3;
 }
 
+/* ── Chips ── */
 .chip-grid {
     display: flex;
     flex-wrap: wrap;
@@ -128,28 +213,94 @@ input[type="text"], select {
     gap: 6px;
     border: 1px solid var(--line);
     border-radius: 999px;
-    padding: 8px 10px;
+    padding: 8px 12px;
     color: var(--muted);
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
+    background: #FAFBFD;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 
+.chip:has(input:checked) {
+    border-color: var(--gold);
+    background: var(--gold-light);
+    color: var(--navy);
+}
+
+/* ── Buttons ── */
 .primary-button {
-    width: 100%;
     border: 0;
     border-radius: 6px;
-    padding: 13px 16px;
-    background: var(--accent);
-    color: white;
+    padding: 13px 20px;
+    background: var(--gold);
+    color: var(--navy);
     font: inherit;
     font-weight: 700;
     cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.15s, color 0.15s;
 }
 
 .primary-button:hover {
-    background: var(--accent-dark);
+    background: var(--navy);
+    color: white;
 }
 
+.secondary-button {
+    border: 2px solid var(--navy);
+    border-radius: 6px;
+    padding: 10px 14px;
+    background: transparent;
+    color: var(--navy);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, color 0.15s;
+}
+
+.secondary-button:hover {
+    background: var(--navy);
+    color: white;
+}
+
+/* ── Page Actions ── */
+.page-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.page-actions .primary-button {
+    min-width: 220px;
+}
+
+/* ── Goal Note ── */
+.goal-note {
+    border-left: 4px solid var(--gold);
+    background: var(--gold-light);
+    border-radius: 0 6px 6px 0;
+    color: var(--navy);
+    font-weight: 600;
+    line-height: 1.45;
+    padding: 14px;
+}
+
+/* ── Results Header ── */
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+}
+
+.results-header h2 {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* ── Results Grid ── */
 .results {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -168,16 +319,19 @@ input[type="text"], select {
 .course-card {
     border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 12px;
+    padding: 12px 14px;
+    background: #FAFBFD;
+    border-left: 3px solid var(--gold);
 }
 
 .course-card strong {
     display: block;
     margin-bottom: 4px;
+    color: var(--navy);
 }
 
 .score-line {
-    color: var(--text);
+    color: var(--navy);
     font-weight: 700;
     margin: 6px 0 8px;
 }
@@ -188,7 +342,7 @@ input[type="text"], select {
 }
 
 .explanation-toggle summary {
-    color: var(--accent-dark);
+    color: var(--gold-dark);
     cursor: pointer;
     font-weight: 700;
 }
@@ -203,6 +357,7 @@ input[type="text"], select {
     margin-top: 4px;
 }
 
+/* ── Badges ── */
 .badges {
     display: flex;
     flex-wrap: wrap;
@@ -212,13 +367,15 @@ input[type="text"], select {
 
 .badge {
     border-radius: 999px;
-    padding: 4px 8px;
-    background: #eef4ff;
-    color: var(--accent-dark);
+    padding: 4px 10px;
+    background: var(--gold-light);
+    color: var(--navy);
     font-size: 0.78rem;
     font-weight: 700;
+    border: 1px solid rgba(200, 162, 52, 0.4);
 }
 
+/* ── Misc ── */
 .muted {
     color: var(--muted);
 }
@@ -232,13 +389,35 @@ input[type="text"], select {
     overflow: auto;
 }
 
+.roadmap-text {
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+.roadmap-path {
+    color: var(--gold-dark);
+    font-weight: 700;
+}
+
+/* ── Responsive ── */
 @media (max-width: 900px) {
-    .dashboard,
+    .setup-grid,
     .results {
         grid-template-columns: 1fr;
     }
 
     .checkbox-grid {
         grid-template-columns: 1fr;
+    }
+
+    .results-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .page-actions .primary-button,
+    .secondary-button {
+        width: 100%;
     }
 }

@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <header class="site-header">
+        <div class="site-header-inner">
+            <span class="brand-abbr">ASU</span>
+            <span class="brand-divider"></span>
+            <span class="brand-label">Angelo State University</span>
+        </div>
+    </header>
     <main class="app-shell">
         <section class="intro">
             <div>
@@ -16,135 +23,118 @@
             </div>
         </section>
 
-        <section class="dashboard">
-            <form id="advisor-form" class="panel">
-                <h2>Student Profile</h2>
+        <form id="advisor-form">
+            <section id="setup-page" class="page-section">
+                <div class="setup-grid">
+                    <article class="panel">
+                        <h2>Student Profile</h2>
 
-                <label class="field">
-                    <span>Student name</span>
-                    <input id="student-name" type="text" placeholder="Enter your name">
-                </label>
-
-                <label class="field">
-                    <span>Max credits</span>
-                    <select id="max-credits">
-                        <option value="6">6 credits</option>
-                        <option value="9">9 credits</option>
-                        <option value="12" selected>12 credits</option>
-                        <option value="15">15 credits</option>
-                    </select>
-                </label>
-
-                <div class="field">
-                    <span>Completed courses</span>
-                    <div class="checkbox-grid">
-                        {% for code, course in courses.items() %}
-                        <label class="checkbox-card">
-                            <input type="checkbox" name="completed" value="{{ code }}">
-                            <span>{{ code }}</span>
-                            <small>{{ course.name }}</small>
+                        <label class="field">
+                            <span>Student name</span>
+                            <input id="student-name" type="text" placeholder="Enter your name">
                         </label>
-                        {% endfor %}
-                    </div>
-                </div>
 
-                <div class="field">
-                    <span>Interests</span>
-                    <div class="chip-grid">
-                        {% for interest in interests %}
-                        <label class="chip">
-                            <input type="checkbox" name="interest" value="{{ interest }}">
-                            <span>{{ interest }}</span>
+                        <label class="field">
+                            <span>Max credits</span>
+                            <select id="max-credits">
+                                <option value="6">6 credits</option>
+                                <option value="9">9 credits</option>
+                                <option value="12" selected>12 credits</option>
+                                <option value="15">15 credits</option>
+                            </select>
                         </label>
-                        {% endfor %}
-                    </div>
+
+                        <div class="field">
+                            <span>Completed courses</span>
+                            <div class="checkbox-grid">
+                                {% for code, course in courses.items() %}
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="completed" value="{{ code }}">
+                                    <span>{{ code }}</span>
+                                    <small>{{ course.name }}</small>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <span>Interests</span>
+                            <div class="chip-grid">
+                                {% for interest in interests %}
+                                <label class="chip">
+                                    <input type="checkbox" name="interest" value="{{ interest }}">
+                                    <span>{{ interest }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="panel">
+                        <h2>Target Goal Analysis</h2>
+                        <p class="muted">Select a future course goal to include a backward-chaining roadmap in the results.</p>
+
+                        <label class="field">
+                            <span>Select target course</span>
+                            <select id="target-course">
+                                <option value="">No target course selected</option>
+                                {% for code, course in courses.items() %}
+                                <option value="{{ code }}">{{ code }}: {{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+
+                        <div class="goal-note">
+                            The roadmap result will appear on the results page with the course recommendations.
+                        </div>
+                    </article>
                 </div>
 
-                <button class="primary-button" type="submit">Recommend Courses</button>
-            </form>
-
-            <article class="panel" style="grid-column: 1; margin-top: 1rem;">
-                <h2>Target Goal Analysis (Backward Chaining)</h2>
-                <p class="muted" style="margin-bottom: 1rem;">Select a future goal to see required prerequisites.</p>
-                
-                <label class="field">
-                    <span>Select Target Course</span>
-                    <select id="target-course" style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ddd;">
-                        <option value="">-- Choose a Course --</option>
-                        {% for code, course in courses.items() %}
-                        <option value="{{ code }}">{{ code }}: {{ course.name }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-                
-                <button class="primary-button" type="button" onclick="analyzeGoal()" style="background-color: #6366f1; margin-top: 1rem;">Analyze Roadmap</button>
-
-                <div id="goal-result" style="display:none; margin-top: 1.5rem; padding: 1rem; border-radius: 8px; background-color: #f8fafc; border-left: 4px solid #6366f1;">
-                    <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Roadmap Result:</h3>
-                    <p id="roadmap-path" style="line-height: 1.6;"></p>
+                <div class="page-actions">
+                    <button class="primary-button" type="submit">View Results</button>
                 </div>
-            </article>
-
-            <section class="results">
-                <article class="panel">
-                    <h2>Recommended Schedule</h2>
-                    <p id="credit-total" class="muted">No recommendation yet.</p>
-                    <div id="recommended-courses" class="course-list"></div>
-                </article>
-
-                <article class="panel">
-                    <h2>Eligible Courses</h2>
-                    <div id="eligible-courses" class="course-list compact"></div>
-                </article>
-
-                <article class="panel">
-                    <h2>Unavailable Courses</h2>
-                    <div id="unavailable-courses" class="course-list compact"></div>
-                </article>
-
-                <article class="panel wide">
-                    <h2>Reasoning Explanation</h2>
-                    <ol id="reasoning-steps" class="reasoning"></ol>
-                </article>
             </section>
-        </section>
+
+            <section id="results-page" class="page-section hidden">
+                <div class="results-header">
+                    <div>
+                        <p class="eyebrow">Advisor Results</p>
+                        <h2>Recommended Course Plan</h2>
+                        <p id="credit-total" class="muted">No recommendation yet.</p>
+                    </div>
+                    <button id="edit-profile" class="secondary-button" type="button">Edit Profile</button>
+                </div>
+
+                <section class="results">
+                    <article id="goal-result" class="panel wide hidden">
+                        <h2>Goal Roadmap</h2>
+                        <p id="roadmap-path" class="roadmap-text"></p>
+                    </article>
+
+                    <article class="panel">
+                        <h2>Recommended Schedule</h2>
+                        <div id="recommended-courses" class="course-list"></div>
+                    </article>
+
+                    <article class="panel">
+                        <h2>Eligible Courses</h2>
+                        <div id="eligible-courses" class="course-list compact"></div>
+                    </article>
+
+                    <article class="panel">
+                        <h2>Unavailable Courses</h2>
+                        <div id="unavailable-courses" class="course-list compact"></div>
+                    </article>
+
+                    <article class="panel wide">
+                        <h2>Reasoning Explanation</h2>
+                        <ol id="reasoning-steps" class="reasoning"></ol>
+                    </article>
+                </section>
+            </section>
+        </form>
     </main>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-    
-    <script>
-    function analyzeGoal() {
-        const target = document.getElementById('target-course').value;
-        const resultDiv = document.getElementById('goal-result');
-        const pathSpan = document.getElementById('roadmap-path');
-        
-        if (!target) {
-            alert("Please select a target course first.");
-            return;
-        }
-
-        const completed = Array.from(document.querySelectorAll('input[name="completed"]:checked'))
-                               .map(cb => cb.value);
-
-        fetch('/analyze-goal', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                target_course: target,
-                passed_courses: completed 
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            resultDiv.style.display = 'block';
-            if (data.missing && data.missing.length > 0) {
-                pathSpan.innerHTML = `To take <strong>${target}</strong>, you need to complete: <br><span style="color: #e11d48;">${data.missing.join(" → ")}</span>`;
-            } else {
-                pathSpan.innerHTML = `🎉 You have met all prerequisites for <strong>${target}</strong>!`;
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-    </script>
 </body>
 </html>
